@@ -399,6 +399,7 @@
             <div class="toolbar">
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="btn btn-primary" onclick="openImport()">📥 导入名单</button>
+                    <button class="btn btn-primary" onclick="openAddModal()">➕ 新增人员</button>
                     <button class="btn" onclick="openQR()">📱 二维码</button>
                     <button class="btn btn-success" onclick="exportCSV()">📊 导出结果</button>
                     <button class="btn btn-danger" onclick="clearAll()">🗑 清空</button>
@@ -465,6 +466,32 @@
             <div class="qrcode-display" id="qr-box"></div>
             <div class="modal-actions">
                 <button class="btn" onclick="closeModal('md-qr')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增人员弹窗 -->
+    <div class="modal" id="md-add">
+        <div class="modal-box" style="max-width:420px;">
+            <h3>新增参会人员</h3>
+            <p class="desc">逐条添加参会者信息</p>
+            <div style="margin:14px 0;">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-size:14px;color:#555;font-weight:500;display:block;margin-bottom:6px;">姓名 <span style="color:#e74c3c;">*</span></label>
+                    <input type="text" id="add-name" placeholder="请输入姓名" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-size:14px;color:#555;font-weight:500;display:block;margin-bottom:6px;">公司</label>
+                    <input type="text" id="add-company" placeholder="请输入公司名称" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-size:14px;color:#555;font-weight:500;display:block;margin-bottom:6px;">手机号 <span style="color:#e74c3c;">*</span></label>
+                    <input type="text" id="add-phone" placeholder="请输入手机号" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="confirmAdd()">确认添加</button>
+                <button class="btn" onclick="closeModal('md-add')">取消</button>
             </div>
         </div>
     </div>
@@ -670,6 +697,30 @@
                 await apiDelete('/participants?id=eq.' + id);
                 loadData();
             } catch (err) { alert('删除失败：' + err.message); }
+        }
+
+        function openAddModal() {
+            document.getElementById('md-add').classList.add('show');
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-company').value = '';
+            document.getElementById('add-phone').value = '';
+            document.getElementById('add-name').focus();
+        }
+
+        async function confirmAdd() {
+            const name = document.getElementById('add-name').value.trim();
+            const company = document.getElementById('add-company').value.trim();
+            const phone = document.getElementById('add-phone').value.trim();
+
+            if (!name) { alert('请输入姓名'); return; }
+            if (!phone) { alert('请输入手机号'); return; }
+
+            try {
+                await apiPost('/participants', { name, company, phone });
+                alert('添加成功');
+                closeModal('md-add');
+                loadData();
+            } catch (err) { alert('添加失败：' + err.message); }
         }
 
         async function clearAll() {
