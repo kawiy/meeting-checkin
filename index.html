@@ -716,11 +716,18 @@
             if (!phone) { alert('请输入手机号'); return; }
 
             try {
-                await apiPost('/participants', { name, company, phone });
-                alert('添加成功');
+                const existing = await apiGet('/participants', { phone: 'eq.' + phone, select: '*' });
+                if (existing && existing.length > 0) {
+                    if (!confirm('该手机号已存在（' + existing[0].name + '），是否覆盖更新？')) return;
+                    await apiPatch('/participants?phone=eq.' + encodeURIComponent(phone), { name, company });
+                    alert('更新成功');
+                } else {
+                    await apiPost('/participants', { name, company, phone });
+                    alert('添加成功');
+                }
                 closeModal('md-add');
                 loadData();
-            } catch (err) { alert('添加失败：' + err.message); }
+            } catch (err) { alert('操作失败：' + err.message); }
         }
 
         async function clearAll() {
