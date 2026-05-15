@@ -524,6 +524,7 @@
                 method: 'POST', headers: {...HEADERS, ...extraHeaders}, body: JSON.stringify(body)
             });
             if (!res.ok) throw new Error(await res.text());
+            if (res.status === 204) return {};
             return res.json();
         }
         async function apiPatch(path, body) {
@@ -531,11 +532,13 @@
                 method: 'PATCH', headers: HEADERS, body: JSON.stringify(body)
             });
             if (!res.ok) throw new Error(await res.text());
+            if (res.status === 204) return {};
             return res.json();
         }
         async function apiDelete(path) {
             const res = await fetch(API_URL + path, { method: 'DELETE', headers: HEADERS });
             if (!res.ok) throw new Error(await res.text());
+            if (res.status === 204) return {};
             return res.json();
         }
 
