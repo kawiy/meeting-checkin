@@ -350,27 +350,30 @@
         <div class="checkin-wrap">
             <div class="logo">✓</div>
             <h2>会议签到</h2>
-            <p class="sub">请输入您的信息完成签到</p>
-            <div class="form-group">
-                <label>姓名</label>
-                <input type="text" id="ci-name" placeholder="请输入您的姓名" autocomplete="off">
+            <p class="sub" id="ci-subtitle">请输入您的信息完成签到</p>
+            <div id="ci-form">
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="ci-name" placeholder="请输入您的姓名" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>手机号码</label>
+                    <input type="tel" id="ci-phone" placeholder="请输入您的手机号码" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>公司名称（选填）</label>
+                    <input type="text" id="ci-company" placeholder="请输入您的公司名称" autocomplete="off">
+                </div>
+                <button class="btn-block" id="btn-ci" onclick="doCheckIn()">立即签到</button>
             </div>
-            <div class="form-group">
-                <label>手机号码</label>
-                <input type="tel" id="ci-phone" placeholder="请输入您的手机号码" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>公司名称（选填）</label>
-                <input type="text" id="ci-company" placeholder="请输入您的公司名称" autocomplete="off">
-            </div>
-            <button class="btn-block" id="btn-ci" onclick="doCheckIn()">立即签到</button>
             <div id="ci-result" class="result-box">
                 <div class="icon" id="ci-icon"></div>
                 <h4 id="ci-title"></h4>
                 <p id="ci-text"></p>
                 <div id="ci-detail" class="result-detail" style="display:none"></div>
+                <button class="btn-block" id="btn-reset" style="margin-top:20px;display:none;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="resetCheckin()">继续签到</button>
             </div>
-            <div class="tips"><strong>提示：</strong>输入姓名或手机号码任意一项即可签到，同时输入匹配更准确。</div>
+            <div class="tips" id="ci-tips"><strong>提示：</strong>输入姓名或手机号码任意一项即可签到，同时输入匹配更准确。</div>
         </div>
     </div>
 
@@ -609,7 +612,8 @@
                             check_in_time: new Date().toISOString()
                         });
                         showCIResult('ok', '✓', '签到成功，欢迎您的到来', `${p.name}，签到成功！欢迎您的到来！`, {...p, checked_in: true, check_in_time: new Date().toISOString()});
-                        loadData();
+                        // 后台异步刷新数据，不阻塞用户
+                        setTimeout(() => loadData(), 100);
                     }
                 }
             } catch (err) {
@@ -634,9 +638,29 @@
                     <p><strong>签到时间：</strong>${p.check_in_time ? new Date(p.check_in_time).toLocaleString('zh-CN') : '刚刚'}</p>
                 `;
             } else detail.style.display = 'none';
+
+            if (type === 'ok') {
+                document.getElementById('ci-form').style.display = 'none';
+                document.getElementById('ci-tips').style.display = 'none';
+                document.getElementById('ci-subtitle').style.display = 'none';
+                document.getElementById('btn-reset').style.display = 'block';
+            }
+        }
+
+        function resetCheckin() {
+            document.getElementById('ci-form').style.display = 'block';
+            document.getElementById('ci-tips').style.display = 'block';
+            document.getElementById('ci-subtitle').style.display = 'block';
+            document.getElementById('btn-reset').style.display = 'none';
+            document.getElementById('ci-result').className = 'result-box';
+            document.getElementById('ci-icon').textContent = '';
+            document.getElementById('ci-title').textContent = '';
+            document.getElementById('ci-text').textContent = '';
+            document.getElementById('ci-detail').style.display = 'none';
             document.getElementById('ci-name').value = '';
             document.getElementById('ci-phone').value = '';
             document.getElementById('ci-company').value = '';
+            document.getElementById('ci-name').focus();
         }
 
         document.querySelectorAll('#page-checkin input').forEach(input => {
