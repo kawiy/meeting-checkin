@@ -512,6 +512,7 @@
             'Content-Type': 'application/json'
         };
 
+        console.log('Meeting Checkin App v2 - loaded');
         let allData = [];
         let filterTab = 'all';
         let importPreview = [];
@@ -887,7 +888,7 @@
         function openQR() {
             document.getElementById('md-qr').classList.add('show');
             const box = document.getElementById('qr-box');
-            const url = window.location.href.split('#')[0].split('?')[0] + '#checkin';
+            const url = window.location.href.split('#')[0].split('?')[0] + '?v=2#checkin';
             box.innerHTML = `
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(url)}" alt="签到二维码" onerror="this.style.display='none';document.getElementById('qr-fallback').style.display='block';">
                 <div id="qr-fallback" style="display:none;padding:20px;background:#f8f9fa;border-radius:8px;font-size:14px;color:#666;">
